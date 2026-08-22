@@ -1,0 +1,20 @@
+{
+  "name": "cursor-completion-sound",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PRTLCTRL/cursor-completion-sound.git"
+  },
+  "description": "Cursor plugin that plays a local sound whenever an agent or chat turn finishes.",
+  "scripts": {
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/play-completion-sound.ps1",
+    "test": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-hook.ps1",
+    "generate-sound": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-completion-wav.ps1",
+    "install-plugin": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-plugin.ps1",
+    "install-hooks": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-plugin.ps1",
+    "install-user-hooks": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-user-hooks.ps1",
+    "uninstall-hooks": "powershell -NoProfile -ExecutionPolicy Bypass -File ./uninstall.ps1",
+    "uninstall-plugin": "powershell -NoProfile -ExecutionPolicy Bypass -File ./uninstall.ps1"
+  }
+}

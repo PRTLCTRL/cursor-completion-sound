@@ -1,0 +1,14 @@
+{
+  "name": "completion-sound",
+  "version": "1.1.0",
+  "description": "Plays a local WAV whenever a Cursor agent, chat, or Task subagent finishes.",
+  "author": {
+    "name": "Arsal"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/PRTLCTRL/cursor-completion-sound",
+  "repository": "https://github.com/PRTLCTRL/cursor-completion-sound",
+  "keywords": ["hooks", "sound", "notification", "completion"],
+  "hooks": "hooks/hooks.json",
+  "logo": "assets/logo.svg"
+}
