@@ -125,9 +125,11 @@ if (-not (Test-Path -LiteralPath $customSoundsDirectory)) {
 
 Copy-Item -LiteralPath $bundledPlayer -Destination $installedPlayer -Force
 Copy-Item -LiteralPath $bundledWavPlayer -Destination $installedWavPlayer -Force
+# Seed config.json only on first install so personal settings survive updates.
 $bundledConfig = Join-Path $repoRoot "config.json"
-if (Test-Path -LiteralPath $bundledConfig) {
-    Copy-Item -LiteralPath $bundledConfig -Destination (Join-Path $hooksDirectory "config.json") -Force
+$installedConfig = Join-Path $hooksDirectory "config.json"
+if ((Test-Path -LiteralPath $bundledConfig) -and -not (Test-Path -LiteralPath $installedConfig)) {
+    Copy-Item -LiteralPath $bundledConfig -Destination $installedConfig -Force
 }
 if (Test-Path -LiteralPath $bundledCmd) {
     Copy-Item -LiteralPath $bundledCmd -Destination $installedCmd -Force
