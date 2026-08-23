@@ -9,8 +9,11 @@
   "description": "Cursor plugin that plays a local sound whenever an agent or chat turn finishes.",
   "scripts": {
     "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/play-completion-sound.ps1",
+    "play-long": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/play-wav-only.ps1 -SoundPath ./sounds/long-completion.wav",
     "test": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-hook.ps1",
-    "generate-sound": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-completion-wav.ps1",
+    "generate-sound": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& ./scripts/generate-completion-wav.ps1; & ./scripts/generate-long-completion-wav.ps1\"",
+    "generate-long-sound": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-long-completion-wav.ps1",
+    "configure": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/configure.ps1",
     "install-plugin": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-plugin.ps1",
     "install-hooks": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-plugin.ps1",
     "install-user-hooks": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-user-hooks.ps1",

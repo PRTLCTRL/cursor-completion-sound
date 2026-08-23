@@ -1,2 +1,4 @@
 node_modules/
 .cursor-completion-sound/
+sounds/zelda*
+sounds/user-chime.wav

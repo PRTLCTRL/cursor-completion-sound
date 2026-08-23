@@ -1,6 +1,12 @@
 {
   "version": 1,
   "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"./hooks/play-completion-sound.ps1\"",
+        "timeout": 8
+      }
+    ],
     "stop": [
       {
         "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"./hooks/play-completion-sound.ps1\"",

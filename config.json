@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "longTurnMs": 120000,
+  "shortSoundPath": "",
+  "longSoundPath": ""
+}

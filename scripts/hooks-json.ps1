@@ -54,7 +54,7 @@ function Remove-CompletionSoundUserHooks {
         return
     }
 
-    foreach ($eventName in @("stop", "afterAgentResponse", "subagentStop")) {
+    foreach ($eventName in @("beforeSubmitPrompt", "stop", "afterAgentResponse", "subagentStop")) {
         if (-not $hooksConfig.hooks.$eventName) {
             continue
         }

@@ -1,5 +1,5 @@
-# Writes sounds/completion.wav — a brief Zelda-like discovery sparkle.
-# Original two-note rising chime (not a game soundtrack excerpt).
+# Writes sounds/completion.wav — a soft classic fifth, like a singing bowl.
+# 16-bit PCM / 44100 Hz so Cursor's built-in Completion Sound can play it.
 
 $ErrorActionPreference = "Stop"
 
@@ -16,7 +16,7 @@ function Add-Silence {
     }
 }
 
-function Add-CrystalTone {
+function Add-BowlTone {
     param(
         $sampleList,
         [double]$frequencyHz,
@@ -27,7 +27,7 @@ function Add-CrystalTone {
 
     $sampleCount = [int]($script:sampleRate * $durationSeconds)
     $twoPi = 2.0 * [math]::PI
-    $fadeInSamples = [math]::Max(1, [int]($script:sampleRate * 0.006))
+    $fadeInSamples = [math]::Max(1, [int]($script:sampleRate * 0.045))
 
     for ($sampleIndex = 0; $sampleIndex -lt $sampleCount; $sampleIndex++) {
         $progress = $sampleIndex / [math]::Max($sampleCount - 1, 1)
@@ -41,13 +41,11 @@ function Add-CrystalTone {
 
         $phase = $twoPi * $frequencyHz * $sampleIndex / $script:sampleRate
         $waveform = [math]::Sin($phase)
-        $waveform += 0.38 * [math]::Sin(2.0 * $phase)
-        $waveform += 0.14 * [math]::Sin(3.0 * $phase)
-        $waveform += 0.08 * [math]::Sin(4.0 * $phase)
+        $waveform += 0.10 * [math]::Sin(2.0 * $phase)
 
         $sampleValue = $toneAmplitude * $envelope * $waveform
-        if ($sampleValue -gt 0.98) { $sampleValue = 0.98 }
-        if ($sampleValue -lt -0.98) { $sampleValue = -0.98 }
+        if ($sampleValue -gt 0.95) { $sampleValue = 0.95 }
+        if ($sampleValue -lt -0.95) { $sampleValue = -0.95 }
 
         $pcmSample = [int16][math]::Round($sampleValue * 32767)
         [void]$sampleList.Add($pcmSample)
@@ -87,11 +85,12 @@ if (-not (Test-Path -LiteralPath $soundsDirectory)) {
     New-Item -ItemType Directory -Path $soundsDirectory | Out-Null
 }
 
-# Short rising fourth: B5 then E6, harp/bell harmonics, ~0.45s total.
+# Warm G4 then D5 (perfect fifth). Soft attack, long fade, ~1.3s.
 $pcmSamples = New-Object "System.Collections.Generic.List[int16]"
-Add-CrystalTone -sampleList $pcmSamples -frequencyHz 987.77 -durationSeconds 0.09 -toneAmplitude 0.72 -decayRate 4.2
-Add-Silence -sampleList $pcmSamples -durationSeconds 0.018
-Add-CrystalTone -sampleList $pcmSamples -frequencyHz 1318.51 -durationSeconds 0.34 -toneAmplitude 0.80 -decayRate 3.4
+Add-Silence -sampleList $pcmSamples -durationSeconds 0.08
+Add-BowlTone -sampleList $pcmSamples -frequencyHz 392.00 -durationSeconds 0.42 -toneAmplitude 0.46 -decayRate 1.7
+Add-Silence -sampleList $pcmSamples -durationSeconds 0.04
+Add-BowlTone -sampleList $pcmSamples -frequencyHz 587.33 -durationSeconds 0.78 -toneAmplitude 0.40 -decayRate 1.5
 
 Write-WavFile -filePath $outputPath -pcmSamples $pcmSamples
 Write-Host "Wrote $outputPath"

@@ -1,85 +1,103 @@
 # Cursor completion sound
 
-A **Cursor Plugin** that plays a local WAV when an agent or chat turn finishes. Official local install is `~/.cursor/plugins/local` (Customize → Plugins lists it after reload). Marketplace publish is not required.
+A **Cursor Plugin** that plays a local WAV when an agent or chat turn finishes. Longer turns play an 8-second clip.
+
+Official local install: copy into `~/.cursor/plugins/local`. This repo is Marketplace-ready (public, MIT, `.cursor-plugin/plugin.json`). It is **not listed on the Cursor Marketplace until Anysphere reviews a submit** at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish).
 
 This is not a VS Code extension. Cursor has no documented `onDidCompleteChat` API.
+
+## Install
+
+### Marketplace (after listing)
+
+1. **Customize → Plugins**
+2. Search **completion-sound**
+3. **Install** at user scope
+4. Reload Cursor
+
+Until it is listed, use local install.
+
+### Local (works today)
+
+```powershell
+git clone https://github.com/PRTLCTRL/cursor-completion-sound.git
+cd cursor-completion-sound
+npm test
+npm run install-plugin
+```
+
+Then **Developer: Reload Window**. Confirm **Customize → Plugins** (`completion-sound`) and **Customize → Hooks** (`beforeSubmitPrompt`, `stop`, `afterAgentResponse`, `subagentStop`).
+
+Community catalog (not the official Marketplace): [cursor.directory/plugins/new](https://cursor.directory/plugins/new).
+
+## Settings (no Customize form)
+
+Cursor plugins have **no** Customize → Plugins settings panel. Dashboard `variables` is for team secrets / MCP, not this hook.
+
+Edit this file (survives plugin reinstall):
+
+`C:\Users\Arsal\.cursor\completion-sound.json`
+
+```json
+{
+  "enabled": true,
+  "longTurnMs": 30000,
+  "shortSoundPath": "",
+  "longSoundPath": ""
+}
+```
+
+Or run `npm run configure` to create it (if missing) and open it.
+
+| Knob | Meaning | Default |
+| --- | --- | --- |
+| `enabled` | Play any sound | `true` |
+| `longTurnMs` | Play the 8s clip at or above this duration | `30000` |
+| `shortSoundPath` | Optional 16-bit PCM WAV for short turns | bundled `completion.wav` |
+| `longSoundPath` | Optional 16-bit PCM WAV for long turns | bundled `long-completion.wav` |
+
+Save the file. The next hook run reads it — no reinstall.
+
+Power-user env overrides (win over the file):
+
+| Env | Maps to |
+| --- | --- |
+| `CURSOR_COMPLETION_ENABLED` | `enabled` (`0` / `false` / `off` disables) |
+| `CURSOR_COMPLETION_LONG_MS` | `longTurnMs` |
+| `CURSOR_COMPLETION_SOUND` | `shortSoundPath` |
+| `CURSOR_COMPLETION_SOUND_LONG` | `longSoundPath` |
+
+`setx` needs a Cursor restart. The JSON file does not.
+
+Bundled `config.json` is only the plugin default. User settings win.
 
 ## Hook events
 
 | Event | When it fires |
 | --- | --- |
+| `beforeSubmitPrompt` | User sends a prompt — records turn start, no sound |
 | `stop` | Agent loop ends (`completed` / `error`; `aborted` is silent) |
 | `afterAgentResponse` | An assistant message is finished |
 | `subagentStop` | A Task-tool subagent ends |
 
-Same `conversation_id` is debounced for 4 seconds (parent + children + `stop`/`afterAgentResponse` = one chime). A different chat still chimes.
-
-No Grok-specific event exists. Cloud / background Agents do not load this plugin.
-
-## Install the plugin (this machine)
-
-```powershell
-cd C:\Users\Arsal\Projects\cursor-completion-sound
-npm test
-npm run install-plugin
-```
-
-That copies a self-contained plugin to:
-
-`C:\Users\Arsal\.cursor\plugins\local\completion-sound`
-
-and **removes** the old user-hook files from `C:\Users\Arsal\.cursor\hooks\` / `hooks.json` so you do not get two chimes.
-
-Then:
-
-1. **Developer: Reload Window** (or restart Cursor).
-2. Open **Customize → Plugins** and confirm `completion-sound`.
-3. Open **Customize → Hooks** and confirm `play-completion-sound.ps1` on `stop`, `afterAgentResponse`, and `subagentStop`.
-
-Cursor’s built-in finish sound can stay off if you only want this chime.
-
-## How this differs from the user-hook install
-
-| | Plugin (`npm run install-plugin`) | User hook (`npm run install-user-hooks`) |
-| --- | --- | --- |
-| Where | `~/.cursor/plugins/local/completion-sound` | `~/.cursor/hooks.json` |
-| Shown in | Customize → Plugins | Customize → Hooks only |
-| Default | Yes | Fallback if the plugin does not load |
-
-Each installer **uninstalls the other** so they never run together.
-
-## Verify
-
-1. Agent / Chat: `Reply with ping and stop.`
-2. Ask mode: same prompt.
-3. A Task subagent finishing in the same chat should not play a second chime.
-4. A second, independent chat should play again.
-5. Grok Bot: try a short message. If silent, that surface has no documented hook.
-6. `npm run dev` plays the WAV without Cursor.
-
-## Swap the sound
-
-Replace `sounds/completion.wav` (16-bit PCM WAV), then `npm run install-plugin`. Or:
-
-```powershell
-setx CURSOR_COMPLETION_SOUND "C:\path\to\your.wav"
-```
-
-Restart Cursor after `setx`.
+Duration: `duration_ms` if Cursor sends it, else elapsed time since `beforeSubmitPrompt` for that chat.
 
 ## Limitations
 
 - **Grok Bots:** no documented hook events.
-- **Cloud / background Agents:** do not load `~/.cursor/plugins/local` or user hooks.
-- **sessionEnd / afterAgentThought:** not hooked (conversation close / thinking blocks, not a finished task).
+- **Cloud / background Agents:** do not load this plugin.
 - Audio failures fail open (`{}`, exit 0).
 
 ## Scripts
 
 | Command | Purpose |
 | --- | --- |
-| `npm run dev` | Play the chime once |
-| `npm test` | Fake `stop` / `subagentStop` / `afterAgentResponse` payloads |
-| `npm run install-plugin` | Install local plugin; strip leftover user hooks |
-| `npm run install-user-hooks` | Fallback user hooks; strip the plugin |
-| `npm run uninstall-plugin` | Remove both |
+| `npm run configure` | Create/open `~/.cursor/completion-sound.json` |
+| `npm run install-plugin` | Install local plugin; keep user settings |
+| `npm test` | Fake hook payloads |
+| `npm run dev` | Play the short chime |
+| `npm run play-long` | Play the 8s clip |
+
+## License
+
+MIT. Repo: https://github.com/PRTLCTRL/cursor-completion-sound
