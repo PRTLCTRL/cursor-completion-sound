@@ -24,6 +24,28 @@
         "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/play-completion-sound.ps1",
         "timeout": 8
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${GROK_PLUGIN_ROOT}/scripts/play-grok-sound.sh done",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${GROK_PLUGIN_ROOT}/scripts/play-grok-sound.sh error",
+            "timeout": 8
+          }
+        ]
+      }
     ]
   }
 }

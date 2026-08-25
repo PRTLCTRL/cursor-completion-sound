@@ -1,6 +1,6 @@
 # Cursor completion sound
 
-A **Cursor Plugin** that plays a local WAV when an agent or chat turn finishes. Longer turns play an 8-second clip.
+A **Cursor Plugin** and **Grok Build plugin** that plays a local WAV when an agent turn finishes. Longer Cursor turns play an 8-second clip. Grok plays a short chime on `Stop` and a lower tone on `StopFailure`.
 
 Official local install: copy into `~/.cursor/plugins/local`. This repo is Marketplace-ready (public, MIT, `.cursor-plugin/plugin.json`). It is **not listed on the Cursor Marketplace until Anysphere reviews a submit** at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish).
 
@@ -84,9 +84,38 @@ Duration: `duration_ms` if Cursor sends it, else elapsed time since `beforeSubmi
 
 ## Limitations
 
-- **Grok Bots:** no documented hook events.
-- **Cloud / background Agents:** do not load this plugin.
-- Audio failures fail open (`{}`, exit 0).
+- **Grok Bot (Cursor desktop):** no documented hook events in the Bot cloud runtime — this plugin chimes on **Grok Build** (`grok` CLI / TUI) and local Cursor.
+- **Cloud / background Agents:** do not load the Cursor plugin.
+- Audio failures fail open (`{}`, exit 0). No network.
+
+## Grok Build
+
+Install from this repo (works today, before the official catalog lists it):
+
+```bash
+grok plugin install PRTLCTRL/cursor-completion-sound --trust
+```
+
+Or copy the repo into `~/.grok/plugins/sound-completion` (user plugins are auto-trusted).
+
+| Event | Sound |
+| --- | --- |
+| `Stop` | bundled `sounds/completion.wav` |
+| `StopFailure` | bundled `sounds/error.wav` |
+
+Mute (survives plugin updates):
+
+```bash
+mkdir -p "${GROK_PLUGIN_DATA:-$HOME/.grok/plugin-data/sound-completion}"
+touch "$HOME/.grok/sounds/muted"
+```
+
+Remove that file to unmute.
+
+Playback uses `afplay` (macOS), `paplay` / `pw-play` / `aplay` (Linux), `ffplay`, or PowerShell `SoundPlayer` (Windows). If none exist, the hook no-ops.
+
+Official marketplace listing is a catalog PR to [xai-org/plugin-marketplace](https://github.com/xai-org/plugin-marketplace) pointing at this repo and a pinned commit SHA. The plugin id there is `sound-completion`.
+
 
 ## Scripts
 
